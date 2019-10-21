@@ -1,0 +1,57 @@
+# ----- Game Stats ----- #
+# RESULTS = {
+#     'LOSS': 0,
+#     'SMALL_WIN': 1,
+#     'MED_WIN': 2,
+#     'LARGE_WIN': 3,
+#     'JACKPOT': 4
+# }
+
+RESULTS = ['LOSS', 'SMALL_WIN', 'MED_WIN', 'LARGE_WIN', 'JACKPOT']
+
+
+# Probability Modifiers #
+SMALL_INC_WIN_PROB = 0.05
+LARGE_INC_WIN_PROB = 0.20
+SMALL_DEC_WIN_PROB = -0.05
+LARGE_DEC_WIN_PROB = -0.20
+
+MIN_PROBABILITY = 0.01
+
+
+# How much initial bet is multiplied with each tier #
+WINNING_MULTIPLIER = {
+    'LOSS': 0.0,
+    'SMALL_WIN': 1.0,
+    'MED_WIN': 2.0,
+    'LARGE_WIN': 5.0,
+    'JACKPOT': 20.0
+}
+
+
+# ----- Enjoyment ----- #
+# General #
+ENJOYMENT_DECAY_BASE = 1.1
+THRESHOLD_ENJOYMENT = 10
+
+# tiers #
+LOSS = -7
+SMALL_WIN = 10
+MED_WIN = 15
+LARGE_WIN = 20
+JACKPOT = 50
+
+# Losing Streaks #
+FRESH_LOSS_MULTIPLIER = 0.5
+THREE_LOSS_STREAK_MULTIPLIER = 1
+FIVE_LOSS_STREAK_MULTIPLIER = 1.5
+LARGE_LOSS_STREAK_MULTIPLIER = 1.7
+
+# Winning Streaks #
+FRESH_WIN_MULTIPLIER = 1
+THREE_WIN_MULTIPLIER = 1.2
+FIVE_WIN_MULTIPLIER = 1.5
+LARGE_WIN_STREAK_MULTIPLIER = 1
+
+# Comeback #
+COMEBACK_BASE = 1.2
