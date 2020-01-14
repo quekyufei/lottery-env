@@ -1,20 +1,18 @@
-import dramamanager
-import player
-import game
-import policies
+import os
+import sys
+import config
+from environment import environment_loader
 
-dm = dramamanager.DM()
-player = player.Player(50, policies.policy1)
-game = game.LotteryGame(dm, player, [0.40, 0.30, 0.1, 0.15, 0.05])
+folderpath = os.getcwd()
+sys.path.append(folderpath)
 
-for i in range(100):
-    done = game.step()
 
-    if done:
-        # do something
-        print('done')
-        break
+game = environment_loader.load_lottery_game(config.VERBOSITY)
 
-    print('--')
+if config.DM_TYPE == 'fittedq':
+    from fitted_q import fitted_q_experiment
+    fitted_q_experiment.run(game, config.FITTED_Q_PARAMS)
 
-3
+elif config.DM_TYPE == 'sarsa':
+    from sarsa import sarsa_experiment
+    sarsa_experiment.run(game)
