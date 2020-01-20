@@ -1,4 +1,6 @@
 from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 import numpy as np
 # import pickle
 # import pdb
@@ -7,8 +9,11 @@ FOREST_SAVE_DIRECTORY = '/forests/'
 
 
 class FittedQDm():
-    def __init__(self, gamma):
-        self.gamma = gamma
+    def __init__(self, params):
+        self.gamma = params['GAMMA']
+        self.prune = params['PRUNE']
+        self.n_estimators = params['N_ESTIMATORS']
+        self.n_min_values = params['N_MIN_VALUES']
         self.forests = None
 
     def create_forests(self, game_experience):
@@ -20,10 +25,10 @@ class FittedQDm():
             prev_states = zipped[0]
             rewards = zipped[1]
 
-            regressor = ExtraTreesRegressor(n_estimators=50)
-            regressor.fit(prev_states, rewards)
+            # regressor = ExtraTreesRegressor(n_estimators=self.n_estimators)
+            # regressor.fit(prev_states, rewards)
 
-            self.forests[key] = regressor
+            self.forests[key] = self.build_extra_trees_regressor(prev_states, rewards)
         self.num_iterations = 1
 
     def next_iteration(self, game_experience):
@@ -57,7 +62,30 @@ class FittedQDm():
             x.append(prev_state)
             y.append(new_reward.item())
 
-        regressor = ExtraTreesRegressor(n_estimators=50)
+        return self.build_extra_trees_regressor(x, y)
+
+    def build_extra_trees_regressor(self, x, y):
+        chosen_n_min = 2  # default value, whether pruned or not
+
+        # do pruning here
+        if self.prune:
+            # As detailed in the fitted q paper, we take a cross-validation approach to
+            # select the best n_min to prune the forests with.
+            x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.66)
+
+            best_mse = None
+
+            for n_min in self.n_min_values:
+                reg = ExtraTreesRegressor(n_estimators=self.n_estimators, min_samples_split=n_min)
+                reg.fit(x_train, y_train)
+                y_pred = reg.predict(x_test)
+                mse_value = mean_squared_error(y_pred, y_test)
+                if not best_mse or mse_value < best_mse:
+                    best_mse = mse_value
+                    chosen_n_min = n_min
+            # print(f'Chosen n_min for pruning: {chosen_n_min}')
+
+        regressor = ExtraTreesRegressor(n_estimators=self.n_estimators, min_samples_split=chosen_n_min)
         regressor.fit(x, y)
         return regressor
 
@@ -72,9 +100,6 @@ class FittedQDm():
                 max_action = action
 
         return max_action
-
-    def parse_status(self, num_actions, game_status, player_status):
-        pass
 
     def get_experience_tuple(self, prev_state, reward, new_state):
         prev = self.parse_state(prev_state)
@@ -98,9 +123,6 @@ class FittedQDm():
         tree_input += list(player_status[2:])
 
         return tree_input
-
-    def get_q_value(self, reward, new_q):
-        pass
 
     def save_forest(self):
         path_to_file = FOREST_SAVE_DIRECTORY + 'iteration_' + str(self.num_iterations)

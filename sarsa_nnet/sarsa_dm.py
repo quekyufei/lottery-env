@@ -7,7 +7,7 @@ import torch.utils.data
 import matplotlib.pyplot as plt
 
 
-class DM():
+class SarsaDm():
     def __init__(self):
         # FIXME intialiser should take in these variables
         # FIXME or place these in a constants file

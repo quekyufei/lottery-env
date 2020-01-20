@@ -4,6 +4,8 @@ import numpy as np
 
 
 def run(game, params):
+    print('# -- Fitted Q Experiment -- #')
+    print(f"Num games: {params['NUM_INIT_GAMES']}, Num iterations: {params['NUM_Q_FITTED_ITERATIONS']}, Gamma: {params['GAMMA']}")
     num_init_games = params['NUM_INIT_GAMES']
     num_fitted_q_iterations = params['NUM_Q_FITTED_ITERATIONS']
     num_test_games = params['NUM_TEST_GAMES']
@@ -15,7 +17,7 @@ def run(game, params):
     game_experience = {0: [], 1: [], 2: [], 3: [], 4: []}
     init_game_lengths = []
     init_game_profits = []
-    dm = fitted_q_dm.FittedQDm(params['GAMMA'])
+    dm = fitted_q_dm.FittedQDm(params)
 
     for game_num in range(num_init_games):
         game.reset()
@@ -78,7 +80,7 @@ def run(game, params):
 
         iteration_average_game_length.append(mean(test_game_lengths))
         iteration_average_game_profits.append(mean(test_game_profits))
-        print(f'Iteration {n} test games done.')
+        print(f'Iteration {n + 1} test games done.')
         print(f'Average game length: {mean(test_game_lengths)}')
         print(f'Average game profits: {mean(test_game_profits)}')
         print(f'Actions Taken: {str(test_chosen_actions)}' )

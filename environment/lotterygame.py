@@ -10,10 +10,11 @@ from .constants import *
 
 
 class LotteryGame():
-    def __init__(self, player, verbose=True):
+    def __init__(self, player, params, verbose=True):
         self.verbose = verbose
         self.game_step = 0
         self.player = player
+        self.focus = params['FOCUS']
         self.available_actions = [0, 1, 2, 3, 4]  # 'do nothing', 'increase win', 'big increase win', 'decrease win', 'big decrease win'
         self.plot_point = PlotPoint.beginning()
         self.initialise_probabilities(RELATIVE_WINNING_RATIOS, WIN_CHANCE)
@@ -63,15 +64,18 @@ class LotteryGame():
         # Player enjoyment reward function
         # simple reward to encourage maximising happiness: current enjoyment - threshold enjoyment
         # TODO why bother with threshold? why not use 0?
-
-        current_enjoyment = self.player.current_enjoyment
-        threshold_enjoyment = self.player.pi['THRESHOLD_ENJOYMENT']
-        return current_enjoyment - threshold_enjoyment
         '''
 
         # net casino profits as reward function
         # casino profits == negative of player profits
-        return -self.player.net_profit
+
+        if self.focus == 'enjoyment':
+            current_enjoyment = self.player.current_enjoyment
+            threshold_enjoyment = self.player.pi['THRESHOLD_ENJOYMENT']
+            return current_enjoyment - threshold_enjoyment
+        
+        elif self.focus == 'casino_profits':
+            return -self.player.net_profit
 
     def play_lottery(self, bet):
         tier = np.random.choice(self.available_actions, p=self.lottery_probs)
